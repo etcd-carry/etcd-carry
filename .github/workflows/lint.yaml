@@ -16,7 +16,7 @@ env:
   GO_VERSION: '1.16'
   GOLANGCI_VERSION: 'v1.47'
 
-job:
+jobs:
   golangci-lint:
     runs-on: ubuntu-18.04
     steps:

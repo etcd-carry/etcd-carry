@@ -15,7 +15,7 @@ on:
 env:
   GO_VERSION: '1.16'
 
-job:
+jobs:
   unit-tests:
     runs-on: ubuntu-18.04
     steps:
