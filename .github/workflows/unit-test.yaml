@@ -1,0 +1,45 @@
+name: unit-test
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+      - release-*
+  pull_request:
+    branches:
+      - master
+      - release-*
+
+env:
+  GO_VERSION: '1.16'
+
+job:
+  unit-tests:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Cache Go Dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+      - name: Run Unit Tests
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y librocksdb-dev
+          apt-get clean
+          make test
+      - name: Publish Unit Test Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          flags: unittests
+          file: cover.out
