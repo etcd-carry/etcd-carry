@@ -1,0 +1,52 @@
+filters:
+  sequential:
+    - group: apiextensions.k8s.io
+      sequence: 1
+      resources:
+        - group: apiextensions.k8s.io
+          version: v1beta1
+          kind: CustomResourceDefinition
+    - group: ""
+      sequence: 2
+      resources:
+        - version: v1
+          kind: Namespace
+      labelSelectors:
+        - matchExpressions:
+            - key: test.io/namespace-kind
+              operator: In
+              values:
+                - unique
+                - unit-test
+  secondary:
+    - group: ""
+      resources:
+        - version: v1
+          Kind: Secret
+      namespaceSelectors:
+        - matchExpressions:
+            - key: test.io/namespace-kind
+              operator: In
+              values:
+                - unique
+      fieldSelectors:
+        - matchExpressions:
+            - key: type
+              operator: NotIn
+              values:
+                - kubernetes.io/service-account-token
+      excludes:
+        - resource:
+            version: v1
+            kind: Secret
+          name: exclude-me-secret
+          namespace: unique
+    - group: ""
+      resources:
+        - version: v1
+          kind: ConfigMap
+      namespace: unit-test
+      labelSelectors:
+        - matchExpressions:
+            - key: test.io/namespace-kind
+              operator: Exists

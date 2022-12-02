@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    test.io/namespace-kind: unit
+  name: influxdb1
+  namespace: unit-test
+data:
+  influxdb.conf:
+    hello
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    test.io/namespace-kind: unit
+  name: influxdb2
+  namespace: unique
+data:
+  influxdb.conf:
+    world
