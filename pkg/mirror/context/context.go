@@ -7,7 +7,7 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/filter/kube/layer2"
 	"github.com/etcd-carry/etcd-carry/pkg/mirror/options"
 	"github.com/etcd-carry/etcd-carry/pkg/rest"
-	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"io/ioutil"
@@ -42,9 +42,9 @@ func NewMirrorContext(o *options.MirrorOptions) (*Context, error) {
 	}
 
 	if o.Generic.Debug {
-		clientv3.SetLogger(grpclog.NewLoggerV2WithVerbosity(os.Stderr, os.Stderr, os.Stderr, 4))
+		grpclog.SetLoggerV2(grpclog.NewLoggerV2WithVerbosity(os.Stderr, os.Stderr, os.Stderr, 4))
 	} else {
-		clientv3.SetLogger(grpclog.NewLoggerV2(ioutil.Discard, ioutil.Discard, os.Stderr))
+		grpclog.SetLoggerV2(grpclog.NewLoggerV2(ioutil.Discard, ioutil.Discard, os.Stderr))
 	}
 
 	mirrorCtx.SlaveClient, err = mirrorclientv3.New(mirrorclientv3.ConfigSpec{

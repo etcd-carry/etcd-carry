@@ -5,7 +5,7 @@ import (
 	mirrorcontext "github.com/etcd-carry/etcd-carry/pkg/mirror/context"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testcodec"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testoptions"
-	"go.etcd.io/etcd/mvcc/mvccpb"
+	"go.etcd.io/etcd/api/v3/mvccpb"
 	"testing"
 )
 

@@ -36,7 +36,7 @@ docker-multiarch:
 
 GOLANGCI_LINT = $(shell pwd)/bin/golangci-lint
 golangci-lint:
-	 $(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.42.1)
+	 $(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47)
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 define go-get-tool

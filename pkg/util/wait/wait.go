@@ -2,8 +2,8 @@ package wait
 
 import (
 	mirrorcontext "github.com/etcd-carry/etcd-carry/pkg/mirror/context"
-	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/utils/clock"
 	"time"
 )
 

@@ -21,7 +21,7 @@ func Decode(ctx *mirrorcontext.Context, key, value []byte) (out *KubeResource, e
 	var unknown runtime.Unknown
 	var decoder = Codecs.UniversalDeserializer()
 
-	decryptedValue, _, err := ctx.GetTransformer(string(key)).TransformFromStorage(value, authenticatedDataString(key))
+	decryptedValue, _, err := ctx.GetTransformer(string(key)).TransformFromStorage(ctx, value, authenticatedDataString(key))
 	if err != nil {
 		fmt.Println("transform from storage error: ", string(key), err)
 		return nil, err

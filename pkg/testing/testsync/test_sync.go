@@ -3,7 +3,7 @@ package testsync
 import (
 	"context"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testcodec"
-	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/client/v3"
 	"testing"
 )
 

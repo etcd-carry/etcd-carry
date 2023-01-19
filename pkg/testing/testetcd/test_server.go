@@ -2,7 +2,7 @@ package testetcd
 
 import (
 	"github.com/etcd-carry/etcd-carry/pkg/testing/util"
-	"go.etcd.io/etcd/embed"
+	"go.etcd.io/etcd/server/v3/embed"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
 	"net"

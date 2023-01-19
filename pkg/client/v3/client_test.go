@@ -3,7 +3,7 @@ package v3
 import (
 	"context"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testetcd"
-	"go.etcd.io/etcd/pkg/transport"
+	"go.etcd.io/etcd/client/pkg/v3/transport"
 	"google.golang.org/grpc"
 	"io/ioutil"
 	"os"
