@@ -43,10 +43,9 @@ linters:
     - govet
     - ineffassign
     - misspell
-    - sqlclosecheck
     - staticcheck
-    - structcheck
     - typecheck
+    - vet
     - unconvert
     - unparam
     - unused

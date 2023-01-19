@@ -1,6 +1,8 @@
 package v3
 
-import "go.etcd.io/etcd/clientv3"
+import (
+	"go.etcd.io/etcd/client/v3"
+)
 
 func New(cs ConfigSpec) (*clientv3.Client, error) {
 	tlscfg, err := NewTLSConfig(cs.Secure)

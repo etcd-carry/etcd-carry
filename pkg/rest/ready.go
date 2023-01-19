@@ -1,8 +1,8 @@
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/json"
 	"net/http"
 	"sync"
 )

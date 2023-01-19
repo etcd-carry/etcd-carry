@@ -6,7 +6,7 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/filter/kube/layer2"
 	"github.com/etcd-carry/etcd-carry/pkg/filter/kube/rules"
 	mirrorcontext "github.com/etcd-carry/etcd-carry/pkg/mirror/context"
-	"go.etcd.io/etcd/mvcc/mvccpb"
+	"go.etcd.io/etcd/api/v3/mvccpb"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

@@ -7,7 +7,7 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/event"
 	"github.com/etcd-carry/etcd-carry/pkg/kv"
 	mirrorcontext "github.com/etcd-carry/etcd-carry/pkg/mirror/context"
-	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/client/v3"
 	"strconv"
 )
 

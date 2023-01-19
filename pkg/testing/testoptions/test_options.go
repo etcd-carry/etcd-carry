@@ -6,7 +6,7 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testetcd"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/util"
 	"github.com/spf13/pflag"
-	"go.etcd.io/etcd/pkg/transport"
+	"go.etcd.io/etcd/client/pkg/v3/transport"
 	"io/ioutil"
 	"os"
 	"path"

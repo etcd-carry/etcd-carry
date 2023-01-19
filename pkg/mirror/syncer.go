@@ -5,8 +5,8 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/constant"
 	kubeschema "github.com/etcd-carry/etcd-carry/pkg/filter/kube/schema"
 	mirrorcontext "github.com/etcd-carry/etcd-carry/pkg/mirror/context"
-	"go.etcd.io/etcd/clientv3"
-	"go.etcd.io/etcd/mvcc/mvccpb"
+	"go.etcd.io/etcd/api/v3/mvccpb"
+	"go.etcd.io/etcd/client/v3"
 	corev1 "k8s.io/api/core/v1"
 	"strings"
 )

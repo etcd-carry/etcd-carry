@@ -11,8 +11,8 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/util/signal"
 	"github.com/etcd-carry/etcd-carry/pkg/util/wait"
 	"github.com/spf13/cobra"
-	"go.etcd.io/etcd/clientv3"
-	"go.etcd.io/etcd/mvcc/mvccpb"
+	"go.etcd.io/etcd/api/v3/mvccpb"
+	"go.etcd.io/etcd/client/v3"
 	"k8s.io/apimachinery/pkg/util/errors"
 	"time"
 )
