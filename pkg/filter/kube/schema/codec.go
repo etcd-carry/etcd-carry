@@ -8,20 +8,11 @@ import (
 	"k8s.io/apiserver/pkg/storage/value"
 )
 
-type authenticatedDataString string
-
-// AuthenticatedData implements the value.Context interface.
-func (d authenticatedDataString) AuthenticatedData() []byte {
-	return []byte(d)
-}
-
-var _ value.Context = authenticatedDataString("")
-
-func Decode(ctx *mirrorcontext.Context, key, value []byte) (out *KubeResource, err error) {
+func Decode(ctx *mirrorcontext.Context, key, val []byte) (out *KubeResource, err error) {
 	var unknown runtime.Unknown
 	var decoder = Codecs.UniversalDeserializer()
 
-	decryptedValue, _, err := ctx.GetTransformer(string(key)).TransformFromStorage(ctx, value, authenticatedDataString(key))
+	decryptedValue, _, err := ctx.GetTransformer(string(key)).TransformFromStorage(ctx, val, value.DefaultContext(key))
 	if err != nil {
 		fmt.Println("transform from storage error: ", string(key), err)
 		return nil, err

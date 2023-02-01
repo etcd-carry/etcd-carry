@@ -6,11 +6,12 @@ import (
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testcodec"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testoptions"
 	"go.etcd.io/etcd/api/v3/mvccpb"
+	"k8s.io/apiserver/pkg/storage/value"
 	"testing"
 )
 
 func TestAuthenticatedDataString_AuthenticatedData(t *testing.T) {
-	testKey := authenticatedDataString(testcodec.SampleNamespaceMatchedKey1)
+	testKey := value.DefaultContext(testcodec.SampleNamespaceMatchedKey1)
 	if !bytes.Equal(testKey.AuthenticatedData(), testcodec.SampleNamespaceMatchedKey1) {
 		t.Fatal("should not happened")
 	}
