@@ -5,15 +5,15 @@ on:
     tags:
       - v*
     branches:
-      - main
+      - master
       - release-*
   pull_request:
     branches:
-      - main
+      - master
       - release-*
 
 env:
-  GO_VERSION: '1.16'
+  GO_VERSION: '1.18'
 
 jobs:
   unit-tests:
