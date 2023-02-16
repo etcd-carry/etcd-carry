@@ -2,19 +2,15 @@ package app
 
 import (
 	"fmt"
-	"github.com/etcd-carry/etcd-carry/pkg/client/probe/grpc"
 	"github.com/etcd-carry/etcd-carry/pkg/event"
-	"github.com/etcd-carry/etcd-carry/pkg/event/tracker"
 	"github.com/etcd-carry/etcd-carry/pkg/mirror"
 	mirrorcontext "github.com/etcd-carry/etcd-carry/pkg/mirror/context"
 	"github.com/etcd-carry/etcd-carry/pkg/mirror/options"
 	"github.com/etcd-carry/etcd-carry/pkg/util/signal"
-	"github.com/etcd-carry/etcd-carry/pkg/util/wait"
 	"github.com/spf13/cobra"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	"go.etcd.io/etcd/client/v3"
 	"k8s.io/apimachinery/pkg/util/errors"
-	"time"
 )
 
 func NewEtcdMirrorCommand() *cobra.Command {
@@ -64,31 +60,6 @@ func Run(o *options.MirrorOptions, stopCh <-chan struct{}) error {
 
 func preflight(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 	if err := ctx.RestfulServing.Run(stopCh); err != nil {
-		return err
-	}
-
-	t, err := tracker.NewEventTracker(ctx)
-	if err != nil {
-		return err
-	}
-	t.Track(ctx)
-
-	probeFunc := func(ctx *mirrorcontext.Context) error {
-		result, msg, err := ctx.Probe.Probe(ctx.SlaveClient.ActiveConnection())
-		if err == nil && result == grpc.Success {
-			fmt.Println("probe ok!")
-			return nil
-		}
-		fmt.Println("probe failed: ", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// wait slave etcd server become available
-	wait.UntilSucceed(ctx, probeFunc, 3*time.Second, stopCh)
-
-	t.Replay(ctx, stopCh)
-	if err := <-t.Err(); err != nil {
-		fmt.Println("======error exit======")
 		return err
 	}
 
