@@ -36,9 +36,6 @@ jobs:
           restore-keys: ${{ runner.os }}-go-
       - name: Code generate
         run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y librocksdb-dev
-          sudo apt-get clean
           make
       - name: Lint golang code
         uses: golangci/golangci-lint-action@v3.2.0

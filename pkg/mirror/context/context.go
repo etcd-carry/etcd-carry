@@ -2,7 +2,6 @@ package context
 
 import (
 	"context"
-	mirrorgrpcprobe "github.com/etcd-carry/etcd-carry/pkg/client/probe/grpc"
 	mirrorclientv3 "github.com/etcd-carry/etcd-carry/pkg/client/v3"
 	"github.com/etcd-carry/etcd-carry/pkg/filter/kube/layer2"
 	"github.com/etcd-carry/etcd-carry/pkg/mirror/options"
@@ -24,7 +23,6 @@ import (
 type Context struct {
 	context.Context
 	options.MirrorOptions
-	Probe          mirrorgrpcprobe.Probe
 	SlaveClient    *clientv3.Client
 	MasterClient   *clientv3.Client
 	MirrorFilter   *layer2.Filter
@@ -37,7 +35,6 @@ func NewMirrorContext(o *options.MirrorOptions) (*Context, error) {
 	mirrorCtx := &Context{
 		Context:       context.Background(),
 		MirrorOptions: *o,
-		Probe:         mirrorgrpcprobe.New(),
 		Transformers:  make(map[string]value.Transformer),
 	}
 
