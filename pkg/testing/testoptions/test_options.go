@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/etcd-carry/etcd-carry/pkg/mirror/options"
 	"github.com/etcd-carry/etcd-carry/pkg/testing/testetcd"
-	"github.com/etcd-carry/etcd-carry/pkg/testing/util"
 	"github.com/spf13/pflag"
 	"go.etcd.io/etcd/client/pkg/v3/transport"
 	"io/ioutil"
@@ -110,15 +109,10 @@ func GetArguments(t *testing.T, testDir string) (args []string) {
 	if err := ioutil.WriteFile(encryptionFile, []byte(EncryptionProviderConfig), 0644); err != nil {
 		t.Fatal(err)
 	}
-	bindPorts, err := util.GetAvailableTestPorts(1)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	args = []string{
 		"--debug=true",
 		fmt.Sprintf("--mirror-rule=%s", rulesFile),
-		"--mode=active-standby",
 		fmt.Sprintf("--encryption-provider-config=%s", encryptionFile),
 		"--kube-prefix=/registry",
 		"--max-txn-ops=100",
@@ -130,9 +124,6 @@ func GetArguments(t *testing.T, testDir string) (args []string) {
 		"--master-insecure-transport=true",
 		"--slave-insecure-skip-tls-verify=false",
 		"--slave-insecure-transport=true",
-		fmt.Sprintf("--db-path=%s", path.Join(testDir, "db")),
-		"--bind-address=0.0.0.0",
-		fmt.Sprintf("--bind-port=%v", bindPorts[0]),
 	}
 	return args
 }
