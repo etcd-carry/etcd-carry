@@ -25,7 +25,6 @@ func TestMirrorOptions_Flags(t *testing.T) {
 			args: []string{
 				"--debug=true",
 				"--mirror-rule=/etc/etcd/mirror/rules.yaml",
-				"--mode=active-standby",
 				"--encryption-provider-config=/etc/etcd/mirror/encryption.yaml",
 				"--kube-prefix=/registry",
 				"--max-txn-ops=100",
@@ -45,18 +44,9 @@ func TestMirrorOptions_Flags(t *testing.T) {
 				"--slave-endpoints=10.20.100.112:2379",
 				"--slave-insecure-skip-tls-verify=false",
 				"--slave-insecure-transport=true",
-				"--db-path=/etc/etcd/mirror/db",
-				"--bind-address=0.0.0.0",
-				"--bind-port=22222",
 			},
 			errorMsg: "",
 			isValid:  true,
-		},
-		{
-			name:     "invalid Generic --mode option",
-			args:     []string{"--mode=active-active"},
-			errorMsg: "--mode only supports standalone,active-standby",
-			isValid:  false,
 		},
 		{
 			name:     "invalid Etcd --rev option, negative value",
@@ -98,24 +88,6 @@ func TestMirrorOptions_Flags(t *testing.T) {
 			name:     "invalid Transport --slave-endpoints option",
 			args:     []string{""},
 			errorMsg: "--slave-endpoints must be specified",
-			isValid:  false,
-		},
-		{
-			name:     "invalid KeyValue --db-path option",
-			args:     []string{""},
-			errorMsg: "--db-path must be specified",
-			isValid:  false,
-		},
-		{
-			name:     "invalid Daemon --bind-port option, negative value",
-			args:     []string{"--bind-port=-1"},
-			errorMsg: "--bind-port -1 must be between 0 and 65535",
-			isValid:  false,
-		},
-		{
-			name:     "invalid Daemon --bind-port option, large than 65535",
-			args:     []string{"--bind-port=65536"},
-			errorMsg: "--bind-port 65536 must be between 0 and 65535",
 			isValid:  false,
 		},
 	}
