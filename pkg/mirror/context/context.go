@@ -5,7 +5,6 @@ import (
 	mirrorclientv3 "github.com/etcd-carry/etcd-carry/pkg/client/v3"
 	"github.com/etcd-carry/etcd-carry/pkg/filter/kube/layer2"
 	"github.com/etcd-carry/etcd-carry/pkg/mirror/options"
-	"github.com/etcd-carry/etcd-carry/pkg/rest"
 	"go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -13,21 +12,18 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/server/options/encryptionconfig"
 	"k8s.io/apiserver/pkg/storage/value"
-	"net"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 )
 
 type Context struct {
 	context.Context
 	options.MirrorOptions
-	SlaveClient    *clientv3.Client
-	MasterClient   *clientv3.Client
-	MirrorFilter   *layer2.Filter
-	Transformers   map[string]value.Transformer
-	RestfulServing rest.RestfulServing
+	SlaveClient  *clientv3.Client
+	MasterClient *clientv3.Client
+	MirrorFilter *layer2.Filter
+	Transformers map[string]value.Transformer
 }
 
 func NewMirrorContext(o *options.MirrorOptions) (*Context, error) {
@@ -88,11 +84,6 @@ func NewMirrorContext(o *options.MirrorOptions) (*Context, error) {
 	}
 	for gr, transformer := range transformers {
 		mirrorCtx.SetTransformer(gr, transformer)
-	}
-
-	mirrorCtx.RestfulServing, err = rest.NewRestfulServing(net.JoinHostPort(mirrorCtx.MirrorOptions.RestfulServing.BindAddress.String(), strconv.Itoa(mirrorCtx.MirrorOptions.RestfulServing.BindPort)))
-	if err != nil {
-		return nil, err
 	}
 
 	return mirrorCtx, nil

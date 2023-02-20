@@ -51,19 +51,7 @@ func Run(o *options.MirrorOptions, stopCh <-chan struct{}) error {
 		return err
 	}
 
-	if err = preflight(mirrorCtx, stopCh); err != nil {
-		return err
-	}
-
 	return makeMirror(mirrorCtx, stopCh)
-}
-
-func preflight(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
-	if err := ctx.RestfulServing.Run(stopCh); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
@@ -108,9 +96,6 @@ func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 			return err
 		}
 	}
-
-	// finish the list operation and set the ready flag
-	ctx.RestfulServing.SetReady(true)
 
 	wc := s.SyncUpdates()
 	for wr := range wc {
