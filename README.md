@@ -25,21 +25,18 @@ Supports binary deployment and deployment to K8s with helm.
 - dial-timeout -- dial timeout for client connections
 - keepalive-time -- keepalive time for client connections
 - keepalive-timeout -- keepalive timeout for client connections
-- master-endpoints -- List of source etcd servers to connect with (scheme://ip:port), comma separated
-- master-cacert -- verify certificates of TLS-enabled secure servers using this CA bundle
-- master-cert -- identify secure client using this TLS certificate file
-- master-key -- identify secure client using this TLS key file
-- master-insecure-skip-tls-verify -- skip server certificate verification
-- master-insecure-transport -- disable transport security for client connections
-- slave-endpoints -- List of sink etcd servers to connect with (scheme://ip:port), comma separated
-- slave-cacert -- verify certificates of TLS-enabled secure servers using this CA bundle
-- slave-cert -- identify secure client using this TLS certificate file
-- slave-key -- identify secure client using this TLS key file
-- slave-insecure-skip-tls-verify -- skip server certificate verification
-- slave-insecure-transport -- disable transport security for client connections
-- db-path -- the path where kv-db stores data
-- bind-address -- the address the metric endpoint and ready/healthz binds to
-- bind-port -- the port on which to serve restful
+- source-endpoints -- List of source etcd servers to connect with (scheme://ip:port), comma separated
+- source-cacert -- verify certificates of TLS-enabled secure servers using this CA bundle
+- source-cert -- identify secure client using this TLS certificate file
+- source-key -- identify secure client using this TLS key file
+- source-insecure-skip-tls-verify -- skip server certificate verification
+- source-insecure-transport -- disable transport security for client connections
+- dest-endpoints -- List of sink etcd servers to connect with (scheme://ip:port), comma separated
+- dest-cacert -- verify certificates of TLS-enabled secure servers using this CA bundle
+- dest-cert -- identify secure client using this TLS certificate file
+- dest-key -- identify secure client using this TLS key file
+- dest-insecure-skip-tls-verify -- skip server certificate verification
+- dest-insecure-transport -- disable transport security for client connections
 
 ## Custom rules
 
@@ -244,7 +241,6 @@ Generic flags:
 
       --debug                enable client-side debug logging
       --mirror-rule string   Specify the rules to start mirroring (default "/etc/mirror/rules.yaml")
-      --mode string          running mode, standalone or active-standby (default "standalone")
 
 Etcd flags:
 
@@ -258,38 +254,29 @@ Transport flags:
       --dial-timeout duration             dial timeout for client connections (default 2s)
       --keepalive-time duration           keepalive time for client connections (default 2s)
       --keepalive-timeout duration        keepalive timeout for client connections (default 6s)
-      --master-cacert string              verify certificates of TLS-enabled secure servers using this CA bundle (default "/etc/kubernetes/master/etcd/ca.crt")
-      --master-cert string                identify secure client using this TLS certificate file (default "/etc/kubernetes/master/etcd/server.crt")
-      --master-endpoints strings          List of etcd servers to connect with (scheme://ip:port), comma separated
-      --master-insecure-skip-tls-verify   skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
-      --master-insecure-transport         disable transport security for client connections (default true)
-      --master-key string                 identify secure client using this TLS key file (default "/etc/kubernetes/master/etcd/server.key")
-      --slave-cacert string               Verify certificates of TLS enabled secure servers using this CA bundle for the destination cluster (default "/etc/kubernetes/slave/etcd/ca.crt")
-      --slave-cert string                 Identify secure client using this TLS certificate file for the destination cluster (default "/etc/kubernetes/slave/etcd/server.crt")
-      --slave-endpoints strings           List of etcd servers to connect with (scheme://ip:port) for the destination cluster, comma separated
-      --slave-insecure-skip-tls-verify    skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
-      --slave-insecure-transport          Disable transport security for client connections for the destination cluster (default true)
-      --slave-key string                  Identify secure client using this TLS key file for the destination cluster (default "/etc/kubernetes/slave/etcd/server.key")
-
-KeyValue flags:
-
-      --db-path string   the path where kv-db stores data (default "/var/lib/mirror/db")
-
-Daemon flags:
-
-      --bind-address ip   the address the metric endpoint and ready/healthz binds to (default 0.0.0.0)
-      --bind-port int     the port on which to serve restful (default 10520)
+      --source-cacert string              verify certificates of TLS-enabled secure servers using this CA bundle
+      --source-cert string                identify secure client using this TLS certificate file
+      --source-endpoints strings          List of etcd servers to connect with (scheme://ip:port), comma separated
+      --source-insecure-skip-tls-verify   skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
+      --source-insecure-transport         disable transport security for client connections (default true)
+      --source-key string                 identify secure client using this TLS key file
+      --dest-cacert string               Verify certificates of TLS enabled secure servers using this CA bundle for the destination cluster
+      --dest-cert string                 Identify secure client using this TLS certificate file for the destination cluster
+      --dest-endpoints strings           List of etcd servers to connect with (scheme://ip:port) for the destination cluster, comma separated
+      --dest-insecure-skip-tls-verify    skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
+      --dest-insecure-transport          Disable transport security for client connections for the destination cluster (default true)
+      --dest-key string                  Identify secure client using this TLS key file for the destination cluster
 ```
 ### Test the etcd-carry
 
 Prepare the cert and key required to access the source etcd and sink etcd. For example, the path of the cert and key file is as follows:
 ```shell
 /etc/etcd-carry/
-├── master
+├── source
 │   ├── ca.crt
 │   ├── server.crt
 │   └── server.key
-└── slave
+└── dest
     ├── ca.crt
     ├── server.crt
     └── server.key
@@ -305,7 +292,7 @@ kubectl apply -f /opt/kube/
 
 Execute the following command to start synchronizing test resources that match the rules.
 ```shell
-./bin/etcd-carry --master-cacert=/etc/etcd-carry/master/ca.crt --master-cert=/etc/etcd-carry/master/server.crt --master-key=/etc/etcd-carry/master/server.key --master-endpoints=10.20.144.29:2379 --slave-cacert=/etc/etcd-carry/slave/ca.crt --slave-cert=/etc/etcd-carry/slave/server.crt --slave-key=/etc/etcd-carry/slave/server.key --slave-endpoints=192.168.48.220:2379 --encryption-provider-config=./deploy/examples/secrets-encryption.yaml --mirror-rule=./deploy/examples/rules.yaml
+./bin/etcd-carry --source-cacert=/etc/etcd-carry/source/ca.crt --source-cert=/etc/etcd-carry/source/server.crt --source-key=/etc/etcd-carry/source/server.key --source-endpoints=10.20.144.29:2379 --dest-cacert=/etc/etcd-carry/dest/ca.crt --dest-cert=/etc/etcd-carry/dest/server.crt --dest-key=/etc/etcd-carry/dest/server.key --dest-endpoints=192.168.48.220:2379 --encryption-provider-config=./deploy/examples/secrets-encryption.yaml --mirror-rule=./deploy/examples/rules.yaml
 
 ```
 

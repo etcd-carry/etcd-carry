@@ -39,7 +39,7 @@ func (s *syncer) SyncSequential() (<-chan clientv3.GetResponse, chan error) {
 	errChan := make(chan error, 1)
 
 	if s.Etcd.StartReversion == 0 {
-		resp, err := s.MasterClient.Get(s.Context, constant.KubeRootPrefix)
+		resp, err := s.SourceClient.Get(s.Context, constant.KubeRootPrefix)
 		if err != nil {
 			errChan <- err
 			defer close(respChan)
@@ -69,7 +69,7 @@ func (s *syncer) SyncSequential() (<-chan clientv3.GetResponse, chan error) {
 				var kvs []*mvccpb.KeyValue
 				opts := []clientv3.OpOption{clientv3.WithRev(s.Etcd.StartReversion), clientv3.WithRange(clientv3.GetPrefixRangeEnd(key))}
 
-				resp, err := s.MasterClient.Get(s.Context, key, opts...)
+				resp, err := s.SourceClient.Get(s.Context, key, opts...)
 				if err != nil {
 					errChan <- err
 					return
@@ -122,7 +122,7 @@ func (s *syncer) SyncSecondary() (<-chan clientv3.GetResponse, chan error) {
 		for {
 			var kvs []*mvccpb.KeyValue
 
-			resp, err := s.MasterClient.Get(s.Context, key, opts...)
+			resp, err := s.SourceClient.Get(s.Context, key, opts...)
 			if err != nil {
 				errChan <- err
 				return
@@ -173,5 +173,5 @@ func (s *syncer) SyncUpdates() clientv3.WatchChan {
 
 	fmt.Println("Start to watch updates from revision", s.Etcd.StartReversion)
 
-	return s.MasterClient.Watch(s.Context, constant.KubeRootPrefix, clientv3.WithPrefix(), clientv3.WithRev(s.Etcd.StartReversion+1), clientv3.WithPrevKV())
+	return s.SourceClient.Watch(s.Context, constant.KubeRootPrefix, clientv3.WithPrefix(), clientv3.WithRev(s.Etcd.StartReversion+1), clientv3.WithPrevKV())
 }

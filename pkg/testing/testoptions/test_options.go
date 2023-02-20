@@ -120,10 +120,10 @@ func GetArguments(t *testing.T, testDir string) (args []string) {
 		"--dial-timeout=1s",
 		"--keepalive-time=1s",
 		"--keepalive-timeout=1s",
-		"--master-insecure-skip-tls-verify=false",
-		"--master-insecure-transport=true",
-		"--slave-insecure-skip-tls-verify=false",
-		"--slave-insecure-transport=true",
+		"--source-insecure-skip-tls-verify=false",
+		"--source-insecure-transport=true",
+		"--dest-insecure-skip-tls-verify=false",
+		"--dest-insecure-transport=true",
 	}
 	return args
 }
@@ -136,53 +136,53 @@ func GetMirrorOptions(t *testing.T) (ctx *options.MirrorOptions) {
 	}
 	t.Cleanup(func() { os.RemoveAll(testDir) })
 
-	masterCertsDir, err := ioutil.TempDir(testDir, "master_certs")
+	sourceCertsDir, err := ioutil.TempDir(testDir, "source_certs")
 	if err != nil {
 		t.Fatal(err)
 	}
-	masterCAFile, masterCertFile, masterKeyFile := testetcd.GetTLSCerts(t, masterCertsDir)
-	masterConfig := testetcd.NewTestConfig(t)
-	masterConfig.ClientTLSInfo = transport.TLSInfo{
-		TrustedCAFile: masterCAFile,
-		CertFile:      masterCertFile,
-		KeyFile:       masterKeyFile,
+	sourceCAFile, sourceCertFile, sourceKeyFile := testetcd.GetTLSCerts(t, sourceCertsDir)
+	sourceConfig := testetcd.NewTestConfig(t)
+	sourceConfig.ClientTLSInfo = transport.TLSInfo{
+		TrustedCAFile: sourceCAFile,
+		CertFile:      sourceCertFile,
+		KeyFile:       sourceKeyFile,
 	}
-	for i := range masterConfig.ACUrls {
-		masterConfig.ACUrls[i].Scheme = "https"
+	for i := range sourceConfig.ACUrls {
+		sourceConfig.ACUrls[i].Scheme = "https"
 	}
-	for i := range masterConfig.LCUrls {
-		masterConfig.LCUrls[i].Scheme = "https"
+	for i := range sourceConfig.LCUrls {
+		sourceConfig.LCUrls[i].Scheme = "https"
 	}
-	etcdMaster := testetcd.RunEtcdServer(t, masterConfig)
+	etcdSource := testetcd.RunEtcdServer(t, sourceConfig)
 
-	slaveCertsDir, err := ioutil.TempDir(testDir, "slave_certs")
+	destCertsDir, err := ioutil.TempDir(testDir, "dest_certs")
 	if err != nil {
 		t.Fatal(err)
 	}
-	slaveCAFile, slaveCertFile, slaveKeyFile := testetcd.GetTLSCerts(t, slaveCertsDir)
-	slaveConfig := testetcd.NewTestConfig(t)
-	slaveConfig.ClientTLSInfo = transport.TLSInfo{
-		TrustedCAFile: slaveCAFile,
-		CertFile:      slaveCertFile,
-		KeyFile:       slaveKeyFile,
+	destCAFile, destCertFile, destKeyFile := testetcd.GetTLSCerts(t, destCertsDir)
+	destConfig := testetcd.NewTestConfig(t)
+	destConfig.ClientTLSInfo = transport.TLSInfo{
+		TrustedCAFile: destCAFile,
+		CertFile:      destCertFile,
+		KeyFile:       destKeyFile,
 	}
-	for i := range slaveConfig.ACUrls {
-		slaveConfig.ACUrls[i].Scheme = "https"
+	for i := range destConfig.ACUrls {
+		destConfig.ACUrls[i].Scheme = "https"
 	}
-	for i := range slaveConfig.LCUrls {
-		slaveConfig.LCUrls[i].Scheme = "https"
+	for i := range destConfig.LCUrls {
+		destConfig.LCUrls[i].Scheme = "https"
 	}
-	etcdSlave := testetcd.RunEtcdServer(t, slaveConfig)
+	etcdDest := testetcd.RunEtcdServer(t, destConfig)
 
 	args := GetArguments(t, testDir)
-	args = append(args, fmt.Sprintf("--master-cacert=%s", masterCAFile))
-	args = append(args, fmt.Sprintf("--master-cert=%s", masterCertFile))
-	args = append(args, fmt.Sprintf("--master-key=%s", masterKeyFile))
-	args = append(args, fmt.Sprintf("--master-endpoints=%s", strings.Join(etcdMaster.Server.Cluster().ClientURLs(), ",")))
-	args = append(args, fmt.Sprintf("--slave-cacert=%s", slaveCAFile))
-	args = append(args, fmt.Sprintf("--slave-cert=%s", slaveCertFile))
-	args = append(args, fmt.Sprintf("--slave-key=%s", slaveKeyFile))
-	args = append(args, fmt.Sprintf("--slave-endpoints=%s", strings.Join(etcdSlave.Server.Cluster().ClientURLs(), ",")))
+	args = append(args, fmt.Sprintf("--source-cacert=%s", sourceCAFile))
+	args = append(args, fmt.Sprintf("--source-cert=%s", sourceCertFile))
+	args = append(args, fmt.Sprintf("--source-key=%s", sourceKeyFile))
+	args = append(args, fmt.Sprintf("--source-endpoints=%s", strings.Join(etcdSource.Server.Cluster().ClientURLs(), ",")))
+	args = append(args, fmt.Sprintf("--dest-cacert=%s", destCAFile))
+	args = append(args, fmt.Sprintf("--dest-cert=%s", destCertFile))
+	args = append(args, fmt.Sprintf("--dest-key=%s", destKeyFile))
+	args = append(args, fmt.Sprintf("--dest-endpoints=%s", strings.Join(etcdDest.Server.Cluster().ClientURLs(), ",")))
 
 	fs := pflag.NewFlagSet("mirrorcontexttest", pflag.ContinueOnError)
 	o := options.NewMirrorOptions()

@@ -73,7 +73,7 @@ func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 		for r := range seqRC {
 			for _, kv := range r.Kvs {
 				fmt.Println("PUT", string(kv.Key))
-				if _, err := ctx.SlaveClient.Put(ctx, string(kv.Key), string(kv.Value)); err != nil {
+				if _, err := ctx.DestClient.Put(ctx, string(kv.Key), string(kv.Value)); err != nil {
 					return err
 				}
 			}
@@ -87,7 +87,7 @@ func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 		for r := range secRC {
 			for _, kv := range r.Kvs {
 				fmt.Println("PUT", string(kv.Key))
-				if _, err := ctx.SlaveClient.Put(ctx, string(kv.Key), string(kv.Value)); err != nil {
+				if _, err := ctx.DestClient.Put(ctx, string(kv.Key), string(kv.Value)); err != nil {
 					return err
 				}
 			}
@@ -111,7 +111,7 @@ func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 		for _, ev := range wr.Events {
 			nextRev := ev.Kv.ModRevision
 			if lastRev != 0 && nextRev > lastRev {
-				_, err := ctx.SlaveClient.Txn(ctx).Then(ops...).Commit()
+				_, err := ctx.DestClient.Txn(ctx).Then(ops...).Commit()
 				if err != nil {
 					return err
 				}
@@ -120,7 +120,7 @@ func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 			lastRev = nextRev
 
 			if len(ops) == int(ctx.Etcd.MaxTxnOps) {
-				_, err := ctx.SlaveClient.Txn(ctx).Then(ops...).Commit()
+				_, err := ctx.DestClient.Txn(ctx).Then(ops...).Commit()
 				if err != nil {
 					return err
 				}
@@ -149,7 +149,7 @@ func makeMirror(ctx *mirrorcontext.Context, stopCh <-chan struct{}) error {
 		}
 
 		if len(ops) != 0 {
-			_, err := ctx.SlaveClient.Txn(ctx).Then(ops...).Commit()
+			_, err := ctx.DestClient.Txn(ctx).Then(ops...).Commit()
 			if err != nil {
 				return err
 			}

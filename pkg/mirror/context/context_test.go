@@ -15,11 +15,11 @@ func TestNewMirrorContext(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	resp, err := ctx.MasterClient.Get(ctx.Context, "foo")
+	resp, err := ctx.SourceClient.Get(ctx.Context, "foo")
 	if err != nil || resp.Header.GetRevision() != 1 {
 		t.Fatal(err)
 	}
-	resp, err = ctx.SlaveClient.Get(ctx.Context, "foo")
+	resp, err = ctx.DestClient.Get(ctx.Context, "foo")
 	if err != nil || resp.Header.GetRevision() != 1 {
 		t.Fatal(err)
 	}
