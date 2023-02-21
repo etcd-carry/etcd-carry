@@ -18,7 +18,7 @@ func TestNewSyncer(t *testing.T) {
 	}
 
 	syncer := NewSyncer(mirrorCtx)
-	testsync.PrepareTestData(t, mirrorCtx.MasterClient)
+	testsync.PrepareTestData(t, mirrorCtx.SourceClient)
 
 	testCase := []struct {
 		name string
@@ -112,7 +112,7 @@ func TestNewSyncer(t *testing.T) {
 					}
 				}
 			} else if strings.HasPrefix(tc.name, "SyncUpdates") {
-				if _, err := mirrorCtx.MasterClient.Put(mirrorCtx.Context, string(testcodec.SampleCrdResourceKey), string(testcodec.SampleCrdResourceValue)); err != nil {
+				if _, err := mirrorCtx.SourceClient.Put(mirrorCtx.Context, string(testcodec.SampleCrdResourceKey), string(testcodec.SampleCrdResourceValue)); err != nil {
 					t.Fatal(err)
 				}
 				wc := syncer.SyncUpdates()

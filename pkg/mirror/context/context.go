@@ -20,8 +20,8 @@ import (
 type Context struct {
 	context.Context
 	options.MirrorOptions
-	SlaveClient  *clientv3.Client
-	MasterClient *clientv3.Client
+	DestClient   *clientv3.Client
+	SourceClient *clientv3.Client
 	MirrorFilter *layer2.Filter
 	Transformers map[string]value.Transformer
 }
@@ -40,33 +40,33 @@ func NewMirrorContext(o *options.MirrorOptions) (*Context, error) {
 		grpclog.SetLoggerV2(grpclog.NewLoggerV2(ioutil.Discard, ioutil.Discard, os.Stderr))
 	}
 
-	mirrorCtx.SlaveClient, err = mirrorclientv3.New(mirrorclientv3.ConfigSpec{
-		Endpoints:        mirrorCtx.MirrorOptions.Transport.SlaveTransport.ServerList,
+	mirrorCtx.DestClient, err = mirrorclientv3.New(mirrorclientv3.ConfigSpec{
+		Endpoints:        mirrorCtx.MirrorOptions.Transport.DestTransport.ServerList,
 		DialTimeout:      mirrorCtx.MirrorOptions.Transport.DialTimeout,
 		KeepAliveTime:    mirrorCtx.MirrorOptions.Transport.KeepAliveTime,
 		KeepAliveTimeout: mirrorCtx.MirrorOptions.Transport.KeepAliveTimeout,
 		Secure: &mirrorclientv3.SecureCfg{
-			Cert:               mirrorCtx.MirrorOptions.Transport.SlaveTransport.CertFile,
-			Key:                mirrorCtx.MirrorOptions.Transport.SlaveTransport.KeyFile,
-			Cacert:             mirrorCtx.MirrorOptions.Transport.SlaveTransport.CACertFile,
-			InsecureTransport:  mirrorCtx.MirrorOptions.Transport.SlaveTransport.Insecure,
-			InsecureSkipVerify: mirrorCtx.MirrorOptions.Transport.SlaveTransport.InsecureSkipVerify,
+			Cert:               mirrorCtx.MirrorOptions.Transport.DestTransport.CertFile,
+			Key:                mirrorCtx.MirrorOptions.Transport.DestTransport.KeyFile,
+			Cacert:             mirrorCtx.MirrorOptions.Transport.DestTransport.CACertFile,
+			InsecureTransport:  mirrorCtx.MirrorOptions.Transport.DestTransport.Insecure,
+			InsecureSkipVerify: mirrorCtx.MirrorOptions.Transport.DestTransport.InsecureSkipVerify,
 		}})
 	if err != nil {
 		return nil, err
 	}
-	mirrorCtx.MasterClient, err = mirrorclientv3.New(mirrorclientv3.ConfigSpec{
-		Endpoints:        mirrorCtx.MirrorOptions.Transport.MasterTransport.ServerList,
+	mirrorCtx.SourceClient, err = mirrorclientv3.New(mirrorclientv3.ConfigSpec{
+		Endpoints:        mirrorCtx.MirrorOptions.Transport.SourceTransport.ServerList,
 		DialTimeout:      mirrorCtx.MirrorOptions.Transport.DialTimeout,
 		DialOptions:      []grpc.DialOption{grpc.WithBlock()},
 		KeepAliveTime:    mirrorCtx.MirrorOptions.Transport.KeepAliveTime,
 		KeepAliveTimeout: mirrorCtx.MirrorOptions.Transport.KeepAliveTimeout,
 		Secure: &mirrorclientv3.SecureCfg{
-			Cert:               mirrorCtx.MirrorOptions.Transport.MasterTransport.CertFile,
-			Key:                mirrorCtx.MirrorOptions.Transport.MasterTransport.KeyFile,
-			Cacert:             mirrorCtx.MirrorOptions.Transport.MasterTransport.CACertFile,
-			InsecureTransport:  mirrorCtx.MirrorOptions.Transport.MasterTransport.Insecure,
-			InsecureSkipVerify: mirrorCtx.MirrorOptions.Transport.MasterTransport.InsecureSkipVerify,
+			Cert:               mirrorCtx.MirrorOptions.Transport.SourceTransport.CertFile,
+			Key:                mirrorCtx.MirrorOptions.Transport.SourceTransport.KeyFile,
+			Cacert:             mirrorCtx.MirrorOptions.Transport.SourceTransport.CACertFile,
+			InsecureTransport:  mirrorCtx.MirrorOptions.Transport.SourceTransport.Insecure,
+			InsecureSkipVerify: mirrorCtx.MirrorOptions.Transport.SourceTransport.InsecureSkipVerify,
 		}})
 	if err != nil {
 		return nil, err

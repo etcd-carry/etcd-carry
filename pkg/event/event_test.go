@@ -18,7 +18,7 @@ func TestEvent_ProcessEvent(t *testing.T) {
 	}
 
 	syncer := mirror.NewSyncer(mirrorCtx)
-	testsync.PrepareSequentialTestData(t, mirrorCtx.MasterClient)
+	testsync.PrepareSequentialTestData(t, mirrorCtx.SourceClient)
 
 	testCase := []struct {
 		name string
@@ -39,7 +39,7 @@ func TestEvent_ProcessEvent(t *testing.T) {
 
 	for _, tc := range testCase {
 		t.Run(tc.name, func(t *testing.T) {
-			if _, err := mirrorCtx.MasterClient.Put(mirrorCtx.Context, string(testcodec.SampleSecretMatchedKey2), string(testcodec.SampleSecretMatchedValue2)); err != nil {
+			if _, err := mirrorCtx.SourceClient.Put(mirrorCtx.Context, string(testcodec.SampleSecretMatchedKey2), string(testcodec.SampleSecretMatchedValue2)); err != nil {
 				t.Fatal(err)
 			}
 			wc := syncer.SyncUpdates()

@@ -25,18 +25,18 @@ etcd-carry提供一种能力将K8s集群中符合自定义规则的资源实时�
 - dial-timeout -- etcd-carry和服务端建立连接的超时时间
 - keepalive-time -- etcd-carry持续连接(长连接)保活时间
 - keepalive-timeout -- etcd-carry持续连接(长连接)保活超时时间
-- master-endpoints -- -master集群的etcd节点列表地址信息，多个节点用逗号隔开
-- master-cacert -- master集群的CA证书信息
-- master-cert -- etcd-carry和master集群建立安全连接的证书信息
-- master-key -- etcd-carry和master集群建立安全连接的密钥信息
-- master-insecure-skip-tls-verify -- 是否跳过对master证书合法性校验
-- master-insecure-transport -- 未指定证书密钥时，是否和master建立非安全连接
-- slave-endpoints -- slave集群的etcd节点列表地址信息，多个节点用逗号隔开
-- slave-cacert -- slave集群的CA证书信息
-- slave-cert -- etcd-carry和slave集群建立安全连接的证书信息
-- slave-key -- etcd-carry和slave集群建立安全连接的密钥信息
-- slave-insecure-skip-tls-verify -- 是否跳过对slave证书合法性校验
-- slave-insecure-transport -- 未指定证书密钥时，是否和slave建立非安全连接
+- source-endpoints -- 源集群的etcd节点列表地址信息，多个节点用逗号隔开
+- source-cacert -- 源集群的CA证书信息
+- source-cert -- etcd-carry和源集群建立安全连接的证书信息
+- source-key -- etcd-carry和源集群建立安全连接的密钥信息
+- source-insecure-skip-tls-verify -- 是否跳过对源etcd集群证书合法性校验
+- source-insecure-transport -- 未指定证书密钥时，是否和源etcd集群建立非安全连接
+- dest-endpoints -- 目的集群的etcd节点列表地址信息，多个节点用逗号隔开
+- dest-cacert -- 目的集群的CA证书信息
+- dest-cert -- etcd-carry和目的集群建立安全连接的证书信息
+- dest-key -- etcd-carry和目的集群建立安全连接的密钥信息
+- dest-insecure-skip-tls-verify -- 是否跳过对目的集群证书合法性校验
+- dest-insecure-transport -- 未指定证书密钥时，是否和目的集群建立非安全连接
 - db-path -- rocksdb数据目录
 - bind-address -- metric/ready/healthz绑定的地址
 - bind-port -- 绑定的端口
@@ -44,7 +44,7 @@ etcd-carry提供一种能力将K8s集群中符合自定义规则的资源实时�
 ## 自定义同步规则
 
 目前主要支持对K8s资源的同步，后续会进行扩展以支持更多不同数据源。
-未指定同步规则时，运行etcd-carry是不会将master集群上的任何数据同步到slave集群的。
+未指定同步规则时，运行etcd-carry是不会将源集群上的任何数据同步到目的集群的。
 同步规则配置为yaml形式，格式如下：
 
 ```yaml
@@ -245,7 +245,6 @@ Generic flags:
 
       --debug                enable client-side debug logging
       --mirror-rule string   Specify the rules to start mirroring (default "/etc/mirror/rules.yaml")
-      --mode string          running mode, standalone or active-standby (default "standalone")
 
 Etcd flags:
 
@@ -259,18 +258,18 @@ Transport flags:
       --dial-timeout duration             dial timeout for client connections (default 2s)
       --keepalive-time duration           keepalive time for client connections (default 2s)
       --keepalive-timeout duration        keepalive timeout for client connections (default 6s)
-      --master-cacert string              verify certificates of TLS-enabled secure servers using this CA bundle (default "/etc/kubernetes/master/etcd/ca.crt")
-      --master-cert string                identify secure client using this TLS certificate file (default "/etc/kubernetes/master/etcd/server.crt")
-      --master-endpoints strings          List of etcd servers to connect with (scheme://ip:port), comma separated
-      --master-insecure-skip-tls-verify   skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
-      --master-insecure-transport         disable transport security for client connections (default true)
-      --master-key string                 identify secure client using this TLS key file (default "/etc/kubernetes/master/etcd/server.key")
-      --slave-cacert string               Verify certificates of TLS enabled secure servers using this CA bundle for the destination cluster (default "/etc/kubernetes/slave/etcd/ca.crt")
-      --slave-cert string                 Identify secure client using this TLS certificate file for the destination cluster (default "/etc/kubernetes/slave/etcd/server.crt")
-      --slave-endpoints strings           List of etcd servers to connect with (scheme://ip:port) for the destination cluster, comma separated
-      --slave-insecure-skip-tls-verify    skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
-      --slave-insecure-transport          Disable transport security for client connections for the destination cluster (default true)
-      --slave-key string                  Identify secure client using this TLS key file for the destination cluster (default "/etc/kubernetes/slave/etcd/server.key")
+      --source-cacert string              verify certificates of TLS-enabled secure servers using this CA bundle
+      --source-cert string                identify secure client using this TLS certificate file
+      --source-endpoints strings          List of etcd servers to connect with (scheme://ip:port), comma separated
+      --source-insecure-skip-tls-verify   skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
+      --source-insecure-transport         disable transport security for client connections (default true)
+      --source-key string                 identify secure client using this TLS key file
+      --dest-cacert string               Verify certificates of TLS enabled secure servers using this CA bundle for the destination cluster
+      --dest-cert string                 Identify secure client using this TLS certificate file for the destination cluster
+      --dest-endpoints strings           List of etcd servers to connect with (scheme://ip:port) for the destination cluster, comma separated
+      --dest-insecure-skip-tls-verify    skip server certificate verification (CAUTION: this option should be enabled only for testing purposes)
+      --dest-insecure-transport          Disable transport security for client connections for the destination cluster (default true)
+      --dest-key string                  Identify secure client using this TLS key file for the destination cluster
 
 KeyValue flags:
 
@@ -282,32 +281,32 @@ Daemon flags:
       --bind-port int     the port on which to serve restful (default 10520)
 ```
 
-准备访问K8s master集群和slave集群etcd组件所需的证书密钥信息，例如证书密钥文件的路径如下：
+准备访问etcd源集群和目的集群所需的证书密钥信息，例如证书密钥文件的路径如下：
 ```shell
 /etc/etcd-carry/
-├── master
+├── source
 │   ├── ca.crt
 │   ├── server.crt
 │   └── server.key
-└── slave
+└── dest
     ├── ca.crt
     ├── server.crt
     └── server.key
 ```
 
-通过./deploy/examples目录下的示例来演示同步过程，在K8s master集群创建./deploy/examples/kube目录下的K8s资源：
+通过./deploy/examples目录下的示例来演示同步过程，在源K8s master集群创建./deploy/examples/kube目录下的K8s资源：
 ```shell
-# 拷贝./deploy/examples/kube目录到master集群的master节点上
-scp -r ./deploy/examples/kube root@{K8s master集群的master节点IP}:/opt/
+# 拷贝./deploy/examples/kube目录到源k8s集群的master节点上
+scp -r ./deploy/examples/kube root@{源K8s集群的master节点IP}:/opt/
 # 创建测试资源
 kubectl apply -f /opt/kube/
 ```
 
 执行以下命令开始同步符合自定义规则的测试资源：
 ```shell
-./bin/etcd-carry --master-cacert=/etc/etcd-carry/master/ca.crt --master-cert=/etc/etcd-carry/master/server.crt --master-key=/etc/etcd-carry/master/server.key --master-endpoints=10.20.144.29:2379 --slave-cacert=/etc/etcd-carry/slave/ca.crt --slave-cert=/etc/etcd-carry/slave/server.crt --slave-key=/etc/etcd-carry/slave/server.key --slave-endpoints=192.168.48.220:2379 --encryption-provider-config=./deploy/examples/secrets-encryption.yaml --mirror-rule=./deploy/examples/rules.yaml
+./bin/etcd-carry --source-cacert=/etc/etcd-carry/souce/ca.crt --source-cert=/etc/etcd-carry/source/server.crt --source-key=/etc/etcd-carry/source/server.key --source-endpoints=10.20.144.29:2379 --dest-cacert=/etc/etcd-carry/dest/ca.crt --dest-cert=/etc/etcd-carry/dest/server.crt --dest-key=/etc/etcd-carry/dest/server.key --dest-endpoints=192.168.48.220:2379 --encryption-provider-config=./deploy/examples/secrets-encryption.yaml --mirror-rule=./deploy/examples/rules.yaml
 ```
-按照./deploy/examples/rules.yaml中的自定义规则，最终应该只有以下资源会被同步到slave集群：
+按照./deploy/examples/rules.yaml中的自定义规则，最终应该只有以下资源会被同步到目的集群：
 ```shell
 命名空间unique
 命名空间unit-test
