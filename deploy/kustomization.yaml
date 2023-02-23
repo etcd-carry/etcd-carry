@@ -1,0 +1,13 @@
+configMapGenerator:
+- name: etcd-carry-pki
+  files:
+  - source-ca.crt
+  - source-server.crt
+  - source-server.key
+  - dest-ca.crt
+  - dest-server.crt
+  - dest-server.key
+- name: etcd-carry-config
+  files: []
+generatorOptions:
+  disableNameSuffixHash: true
