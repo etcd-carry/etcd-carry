@@ -1,4 +1,4 @@
-secretGenerator:
+configMapGenerator:
 - name: etcd-carry-pki
   files:
   - source-ca.crt
@@ -7,7 +7,6 @@ secretGenerator:
   - dest-ca.crt
   - dest-server.crt
   - dest-server.key
-configMapGenerator:
 - name: etcd-carry-config
   files: []
 generatorOptions:
